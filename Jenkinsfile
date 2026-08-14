@@ -1,13 +1,11 @@
 pipeline {
     agent any
 
-    stages {
+    environment {
+        KUBECONFIG = 'C:\\Users\\Ankit Kumar\\.kube\\config'
+    }
 
-        stage('Checkout Code') {
-            steps {
-                checkout scm
-            }
-        }
+    stages {
 
         stage('Check Kubernetes Context') {
             steps {
@@ -22,28 +20,18 @@ pipeline {
             }
         }
 
-        stage('Deploy To Kubernetes') {
+        stage('Deploy Kubernetes') {
             steps {
                 bat 'kubectl apply -f deployment.yaml --validate=false'
                 bat 'kubectl apply -f service.yaml --validate=false'
             }
         }
 
-        stage('Verify Deployment') {
+        stage('Verify') {
             steps {
                 bat 'kubectl get pods'
                 bat 'kubectl get svc'
             }
-        }
-    }
-
-    post {
-        success {
-            echo 'Deployment Successful!'
-        }
-
-        failure {
-            echo 'Deployment Failed!'
         }
     }
 }
