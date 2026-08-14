@@ -3,21 +3,16 @@ pipeline {
 
     stages {
 
-        stage('Checkout') {
+        stage('Checkout Code') {
             steps {
                 checkout scm
             }
         }
 
-        stage('Docker Version') {
+        stage('Check Kubernetes Context') {
             steps {
-                bat 'docker --version'
-            }
-        }
-
-        stage('Kubectl Version') {
-            steps {
-                bat 'kubectl version --client'
+                bat 'kubectl config current-context'
+                bat 'kubectl get nodes'
             }
         }
 
@@ -27,18 +22,28 @@ pipeline {
             }
         }
 
-        stage('Deploy Kubernetes') {
+        stage('Deploy To Kubernetes') {
             steps {
-                bat 'kubectl apply -f deployment.yaml'
-                bat 'kubectl apply -f service.yaml'
+                bat 'kubectl apply -f deployment.yaml --validate=false'
+                bat 'kubectl apply -f service.yaml --validate=false'
             }
         }
 
-        stage('Verify') {
+        stage('Verify Deployment') {
             steps {
                 bat 'kubectl get pods'
                 bat 'kubectl get svc'
             }
+        }
+    }
+
+    post {
+        success {
+            echo 'Deployment Successful!'
+        }
+
+        failure {
+            echo 'Deployment Failed!'
         }
     }
 }
