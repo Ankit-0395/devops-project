@@ -1,5 +1,6 @@
 apiVersion: apps/v1
 kind: Deployment
+
 metadata:
   name: devops-app
 
@@ -19,8 +20,7 @@ spec:
       containers:
       - name: devops-app
         image: devops-app:v1
-
-        imagePullPolicy: Never
+        imagePullPolicy: IfNotPresent
 
         ports:
         - containerPort: 80
