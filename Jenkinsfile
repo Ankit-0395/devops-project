@@ -3,6 +3,24 @@ pipeline {
 
     stages {
 
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+
+        stage('Docker Version') {
+            steps {
+                bat 'docker --version'
+            }
+        }
+
+        stage('Kubectl Version') {
+            steps {
+                bat 'kubectl version --client'
+            }
+        }
+
         stage('Build Docker Image') {
             steps {
                 bat 'docker build -t devops-app:v1 .'
@@ -13,7 +31,6 @@ pipeline {
             steps {
                 bat 'kubectl apply -f deployment.yaml'
                 bat 'kubectl apply -f service.yaml'
-                bat 'kubectl rollout restart deployment devops-app'
             }
         }
 
