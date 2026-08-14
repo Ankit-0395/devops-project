@@ -7,30 +7,21 @@ pipeline {
 
     stages {
 
-        stage('Check Kubernetes Context') {
-            steps {
-                bat 'kubectl config current-context'
-                bat 'kubectl get nodes'
-            }
-        }
-
         stage('Build Docker Image') {
             steps {
-                bat 'docker build -t devops-app:v1 .'
+                bat "docker build -t devops-app:${BUILD_NUMBER} ."
             }
         }
 
-        stage('Deploy Kubernetes') {
+        stage('Update Deployment') {
             steps {
-                bat 'kubectl apply -f deployment.yaml --validate=false'
-                bat 'kubectl apply -f service.yaml --validate=false'
+                bat "kubectl set image deployment/devops-app devops-app=devops-app:${BUILD_NUMBER}"
             }
         }
 
         stage('Verify') {
             steps {
-                bat 'kubectl get pods'
-                bat 'kubectl get svc'
+                bat 'kubectl rollout status deployment/devops-app'
             }
         }
     }
